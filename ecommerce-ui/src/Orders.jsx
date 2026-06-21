@@ -9,18 +9,40 @@ function Orders() {
 
     const fetchOrders = async () => {
 
-      const token =
-        localStorage.getItem("token");
+      try {
 
-      const response =
-        await api.get("/orders", {
-          headers: {
-            Authorization:
-              `Bearer ${token}`
-          }
-        });
+        const token =
+          localStorage.getItem("token");
 
-      setOrders(response.data);
+        const response =
+          await api.get("/orders", {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          });
+
+        setOrders(response.data);
+
+      } catch (error) {
+
+        console.error(error);
+
+        if (
+          error.response?.status === 403
+        ) {
+
+          localStorage.removeItem(
+            "token"
+          );
+
+          alert(
+            "Session Expired. Please Login Again."
+          );
+
+          window.location.reload();
+        }
+      }
     };
 
     fetchOrders();
@@ -29,21 +51,40 @@ function Orders() {
 
   return (
     <div>
-      <h2>Orders</h2>
 
-      {orders.map(order => (
-       <div className="card" key={order.id}>
+      <h2>📦 Orders</h2>
 
-          <p>Product: {order.productId}</p>
+      {orders.length === 0 ? (
 
-          <p>Quantity: {order.quantity}</p>
+        <p>No Orders Found</p>
 
-          <p>Status: {order.status}</p>
+      ) : (
 
-          <hr />
+        orders.map(order => (
 
-        </div>
-      ))}
+          <div
+            className="card"
+            key={order.id}
+          >
+
+            <p>
+              Product: {order.productId}
+            </p>
+
+            <p>
+              Quantity: {order.quantity}
+            </p>
+
+            <p>
+              Status: {order.status}
+            </p>
+
+            <hr />
+
+          </div>
+        ))
+      )}
+
     </div>
   );
 }

@@ -25,18 +25,33 @@ function Products() {
 
       } catch (error) {
 
-    console.log(
-      "Status:",
-      error.response?.status
-    );
+        console.log(
+          "Status:",
+          error.response?.status
+        );
 
-    console.log(
-      "Data:",
-      error.response?.data
-    );
+        console.log(
+          "Data:",
+          error.response?.data
+        );
 
-    console.error(error);
-}
+        console.error(error);
+
+        if (
+          error.response?.status === 403
+        ) {
+
+          localStorage.removeItem(
+            "token"
+          );
+
+          alert(
+            "Session Expired. Please Login Again."
+          );
+
+          window.location.reload();
+        }
+      }
     };
 
     fetchProducts();
@@ -45,75 +60,121 @@ function Products() {
 
   const placeOrder = async (productId) => {
 
-  try {
+    try {
 
-    const token =
-      localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token");
 
-    const order = {
+      const order = {
 
-      productId: productId,
-      quantity: 1,
-      userEmail: "abhishek@gmail.com"
+        productId: productId,
+        quantity: 1,
+        userEmail: "abhishek@gmail.com"
 
-    };
+      };
 
-    const response =
-      await api.post(
-        "/orders",
-        order,
-        {
-          headers: {
-            Authorization:
-              `Bearer ${token}`
+      const response =
+        await api.post(
+          "/orders",
+          order,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
           }
-        }
-      );
+        );
 
-    alert("Order Created");
+      alert("Order Created");
 
-    console.log(response.data);
+      console.log(response.data);
 
-  } catch (error) {
+    } catch (error) {
 
-    console.error(error);
+      console.error(error);
 
-    alert("Order Failed");
-  }
-};
+      if (
+        error.response?.status === 403
+      ) {
+
+        localStorage.removeItem(
+          "token"
+        );
+
+        alert(
+          "Session Expired. Please Login Again."
+        );
+
+        window.location.reload();
+
+      } else {
+
+        alert("Order Failed");
+      }
+    }
+  };
+
   return (
     <div>
-    <h2>🛍️ Available Products</h2>
 
-      {products.map(product => (
-        <div className="card" key={product.id}>
+      <h2>🛍️ Available Products</h2>
 
-          <h3>{product.name}</h3>
+      {products.length === 0 ? (
 
-          <p>
-            Description: {product.description}
-          </p>
+        <p>No Products Found</p>
 
-          <p>
-            Price: ₹{product.price}
-          </p>
+      ) : (
 
-          <p>
-            Stock: {product.stock}
-          </p>
-          <button
+        products.map(product => (
+
+          <div
+            className="card"
+            key={product.id}
+          >
+
+            <h3>{product.name}</h3>
+
+            <p>
+              Description: {product.description}
+            </p>
+
+            <p>
+              Price: ₹{product.price}
+            </p>
+
+            <p>
+              Stock: {product.stock}
+            </p>
+
+           <button
   className="order-btn"
-  onClick={() =>
-    placeOrder(product.id)
-  }
+  onClick={() => {
+
+    const cart =
+      JSON.parse(
+        localStorage.getItem("cart")
+      ) || [];
+
+    cart.push(product);
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(cart)
+    );
+
+    alert(
+      "Added To Cart"
+    );
+  }}
 >
-  🛒 Order Now
+  🛒 Add To Cart
 </button>
+            <hr />
 
-          <hr />
+          </div>
+        ))
+      )}
 
-        </div>
-      ))}
     </div>
   );
 }

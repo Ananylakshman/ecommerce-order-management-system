@@ -24,7 +24,7 @@ function Login() {
       );
 
       alert("Login Successful");
-
+window.location.reload();
       console.log(response.data);
 
     } catch (error) {

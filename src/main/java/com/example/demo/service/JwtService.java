@@ -25,7 +25,7 @@ public class JwtService {
                 .expiration(
                         new Date(
                                 System.currentTimeMillis()
-                                        + 1000 * 60 * 60
+                                        + 1000L * 60 * 60 * 24 * 7
                         )
                 )
                 .signWith(key)
@@ -41,16 +41,24 @@ public class JwtService {
                 .getSubject();
     }
 
-    public boolean isTokenValid(String token) {
-        try {
-            Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token);
+   public boolean isTokenValid(String token) {
+    try {
 
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token);
+
+        return true;
+
+    } catch (Exception e) {
+
+        System.out.println(
+                "JWT Validation Error: "
+                        + e.getMessage()
+        );
+
+        return false;
     }
+}
 }

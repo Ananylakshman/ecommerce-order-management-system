@@ -1,133 +1,78 @@
 import { useState } from "react";
-
-
-
+import Login from "./Login";
 import Products from "./Products";
-
-
-
 import Orders from "./Orders";
-
-
-
+import Cart from "./Cart";
 import "./App.css";
-
-
-
-
-
-
 
 function App() {
 
+  const token =
+    localStorage.getItem("token");
 
+  const [page, setPage] =
+    useState("products");
 
-
-
-
-
-  const [page, setPage] = useState("products");
-
-
-
-
-
-
+  if (!token) {
+    return <Login />;
+  }
 
   return (
+    <div>
 
-  <div>
+      <div className="navbar">
 
+        <button
+          onClick={() =>
+            setPage("products")
+          }
+        >
+          Products
+        </button>
 
+        <button
+          onClick={() =>
+            setPage("orders")
+          }
+        >
+          Orders
+        </button>
 
-    <div className="navbar">
+        <button
+          onClick={() =>
+            setPage("cart")
+          }
+        >
+          Cart
+        </button>
 
+        <button
+          onClick={() => {
 
+            localStorage.removeItem(
+              "token"
+            );
 
-      <button
+            window.location.reload();
 
-        onClick={() =>
+          }}
+        >
+          Logout
+        </button>
 
-          setPage("products")
+      </div>
 
-        }
+      {page === "products" &&
+        <Products />}
 
-      >
+      {page === "orders" &&
+        <Orders />}
 
-        Products
-
-      </button>
-
-
-
-      <button
-
-        onClick={() =>
-
-          setPage("orders")
-
-        }
-
-      >
-
-        Orders
-
-      </button>
-
-
-
-      <button
-
-        onClick={() => {
-
-          localStorage.removeItem("token");
-
-          alert("Logged Out");
-
-        }}
-
-      >
-
-        Logout
-
-      </button>
-
-
+      {page === "cart" &&
+        <Cart />}
 
     </div>
-
-
-
-    <hr />
-
-
-
-    {page === "products" &&
-
-      <Products />}
-
-
-
-    {page === "orders" &&
-
-      <Orders />}
-
-
-
-  </div>
-
-
-
   );
-
-
-
 }
-
-
-
-
-
-
 
 export default App;
